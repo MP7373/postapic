@@ -1,0 +1,29 @@
+{
+  "name": "waifus",
+  "version": "1.0.0",
+  "description": "MEAN stack web app for posting waifus",
+  "main": "server.js",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "mongodb": "^2.2.11"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "none",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MP7373/waifus.git"
+  },
+  "keywords": [
+    "waifus"
+  ],
+  "author": "MP7373",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/MP7373/waifus/issues"
+  },
+  "homepage": "https://github.com/MP7373/waifus#readme"
+}

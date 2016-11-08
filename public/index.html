@@ -20,8 +20,11 @@
 					</form>
 				</div>
 				<div class="waifuFeed" ng-repeat="waifu in waifus">
-					<h3>{{ waifu[0] }}</h3>
-					<img ng-src="{{ waifu[1] }}" height="300px"  width="300px">
+					<div>
+						<h3>{{ waifu.name }}</h3>
+						<img ng-src="{{ waifu.imageAddress }}" height="300px"  width="300px">
+					</div>
+					<button class="btn" type="button" ng-click="deleteWaifu()">delete</button>
 				</div>
 			</div>
 			<div class="col-md-2"></div>
