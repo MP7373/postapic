@@ -1,0 +1,30 @@
+<html ng-app="waifus">
+	<head>
+		<title>Waifus</title>
+		<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css">
+		<link rel="stylesheet" type="text/css" href="waifus.css">
+		<script type="text/javascript" src="angular.min.js"></script>
+		<script type="text/javascript" src="waifus.js"></script>
+	</head>
+	<body ng-controller="waifusController">
+		<h1 class="page-title">waifus</h1>
+		<div class="row feed">
+			<div class="col-md-2"></div>
+			<div class="col-md-8 text-center">
+				<div class="new-waifu">
+					<form class="form-group text-center">
+						<h2>Post a waifu</h2>
+						<input id="waifu-text-form" type="text" placeholder="Enter waifu's name" ng-model="newWaifuName">
+						<input id="img-url-form" type="text" placeholder="Enter image address" ng-model="newWaifuPic">
+						<button class="btn" type="button" ng-click="submitWaifu()">Submit</button>
+					</form>
+				</div>
+				<div class="waifuFeed" ng-repeat="waifu in waifus">
+					<h3>{{ waifu[0] }}</h3>
+					<img ng-src="{{ waifu[1] }}" height="300px"  width="300px">
+				</div>
+			</div>
+			<div class="col-md-2"></div>
+		</div>
+	</body>
+</html>
