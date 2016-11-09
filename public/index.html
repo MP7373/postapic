@@ -22,12 +22,13 @@
 				<div class="waifuFeed" ng-repeat="waifu in waifus">
 					<div>
 						<h3>{{ waifu.name }}</h3>
-						<img ng-src="{{ waifu.imageAddress }}" height="300px"  width="300px">
+						<img class="img-rounded" ng-src="{{ waifu.imageAddress }}" height="300px" width="300px">
 					</div>
-					<button class="btn" type="button" ng-click="deleteWaifu()">delete</button>
+					<button class="btn deleteButton" type="button" ng-click="deleteWaifu(waifu)">delete</button>
 				</div>
 			</div>
 			<div class="col-md-2"></div>
 		</div>
+		<div height="300px"></div>
 	</body>
 </html>
