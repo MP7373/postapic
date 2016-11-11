@@ -1,18 +1,27 @@
 <div class="row feed">
 	<div class="col-md-2">
-		<h4>Login</h4>
-		<br>
-		<input type="text" placeholder="username" ng-model="username">
-		<br>
-		<input type="password" placeholder="password" ng-model="password">
-		<br>
-		<button id="signInButton" class="btn" ng-click="signIn()">Sign in</button>
-		<br>
-		Not a member?
-		<a class="btn" href="#/signup">Join</a>
+		<div ng-hide="currentUser">
+			<h4>Login</h4>
+			<br>
+			<h6 class="text-danger" ng-show="failedAttempt">Invalid username or password</h6>
+			<input type="text" placeholder="username" ng-model="username">
+			<br>
+			<input type="password" placeholder="password" ng-model="password">
+			<br>
+			<button id="signInButton" class="btn" ng-click="signIn()">Sign in</button>
+			<br>
+			Not a member?
+			<a class="btn" href="#/signup">Join</a>
+		</div>
+		<div ng-show="currentUser">
+			<h3>Logged in as:</h3>
+			<h3>{{ currentUser }}</h3>
+			<br>
+			<a class="btn" ng-click="logout()">Log out</a>
+		</div>
 	</div>
 	<div class="col-md-8 text-center">
-		<div class="new-waifu">
+		<div class="new-waifu" ng-show="currentUser">
 			<form class="form-group text-center">
 				<h2>Post a waifu</h2>
 				<input id="waifu-text-form" type="text" placeholder="Enter waifu's name" ng-model="newWaifuName">
@@ -24,8 +33,9 @@
 			<div>
 				<h3>{{ waifu.name }}</h3>
 				<img class="img-rounded" ng-src="{{ waifu.imageAddress }}" height="300px" width="300px">
+				<h6>Uploaded by: {{ waifu.accountUsername }}</h6>
 			</div>
-			<button class="btn deleteButton" type="button" ng-click="deleteWaifu(waifu)">delete</button>
+			<button class="btn deleteButton" type="button" ng-show="showButton(waifu)" ng-click="deleteWaifu(waifu)">delete</button>
 		</div>
 	</div>
 	<div class="col-md-2"></div>

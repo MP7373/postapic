@@ -4,6 +4,8 @@ var url = "mongodb://localhost:27017/waifus";
 var bodyParser = require("body-parser");
 var bcrypt = require("bcryptjs");
 var app = express();
+var jwt = require("jwt-simple");
+var JWT_SECRET = "SatsukiKiryuinBestWaifu";
 app.use(bodyParser.json());
 app.use(express.static("public"));
 ObjectId = require("mongodb").ObjectID;
@@ -30,11 +32,38 @@ app.get("/waifus", function (req, res, next) {
 	});
 });
 
+//get user account
+app.post("/userAccounts/getId", function (req, res, next) {
+  var token = req.body.token;
+  var decodedToken = jwt.decode(token, JWT_SECRET);
+  var id = decodedToken._id;
+  var idObject = ObjectId(id);
+  MongoClient.connect(url, function (err, db) {
+    assert.equal(null, err);
+    db.collection("userAccounts").findOne(
+      {"_id": idObject},
+      function(err, matchedAccount) {
+        assert.equal(err, null);
+        res.json(matchedAccount);
+        db.close();
+      }
+    );
+  });
+});
+
 //calls postWaifu function to add a new waifu to database
 app.post("/waifus", function (req, res, next) {
+  var token = req.headers.authorization;
+  var decodedToken = jwt.decode(token, JWT_SECRET);
+  var newWaifu = {
+    name: req.body.newWaifuName,
+    imageAddress: req.body.newWaifuPic,
+    accountUsername: decodedToken.username,
+    accountId: decodedToken._id
+  };
 	MongoClient.connect(url, function(err, db) {
   		assert.equal(null, err);
-  		postWaifu(db, req.body.newWaifuName, req.body.newWaifuPic, function() {
+  		postWaifu(db, newWaifu, function() {
       		db.close();
   		});
 	});
@@ -56,6 +85,7 @@ app.post("/userAccounts", function (req, res, next) {
       assert.equal(null, err);
       submitNewAccount(db, req.body.username, req.body.password, function() {
           db.close();
+          res.send();
       });
   });
 });
@@ -65,12 +95,15 @@ app.put("/userAccounts/signIn", function (req, res, next) {
   MongoClient.connect(url, function(err, db) {
       assert.equal(null, err);
       userSignIn(db, req.body.username, req.body.password, 
-        function () {
+        function (validUserAccount) {
           db.close();
-          return res.send();
+          var token = jwt.encode(validUserAccount, JWT_SECRET);
+          return res.json({token: token});
         },
         function () {
+          console.log("Inside invalidCallback.");
           db.close();
+          console.log("Returning res.status(400).send()");
           return res.status(400).send();
         }
       );
@@ -83,9 +116,9 @@ app.listen(3000, function () {
 });
 
 //function that posts new waifu into database
-var postWaifu = function (db, name, imageAddress, callback) {
+var postWaifu = function (db, newWaifu, callback) {
 	db.collection("waifus").insertOne(
-		{"name" : name, "imageAddress" : imageAddress},
+		newWaifu,
 		function (err, result) {
     		assert.equal(err, null);
     		console.log("Inserted waifu into the waifus collection.");
@@ -115,7 +148,7 @@ var submitNewAccount = function (db, username, password, callback) {
         {"username" : username, "password" : hash},
         function (err, submittedAccount) {
           assert.equal(err, null);
-          console.log("Added new user account into the userAccounts collection.");
+          console.log("Added new user account " + username + " into the userAccounts collection.");
           callback();
         }
       );
@@ -128,13 +161,22 @@ var userSignIn = function (db, username, password, validCallback, invalidCallbac
   db.collection("userAccounts").findOne(
     {username: username},
     function (err, selectedAccount) {
-      bcrypt.compare(password, selectedAccount.password, function (err, result) {
-        if (result) {
-          validCallback();
-        } else {
-          invalidCallback();
-        }
-      })
+      console.log("About to run bcrypt.compare");
+      console.log("password = " + password);
+      if(selectedAccount !== null) {
+        bcrypt.compare(password, selectedAccount.password, function (err, result) {
+          console.log("Inside bcrypt.compare");
+          if (result) {
+            validCallback(selectedAccount);
+          } else {
+            console.log("selectedAccount evaluates to not null so the username exists but the input password doesn't match");
+            invalidCallback();
+          }
+        });
+      } else {
+        console.log("selectedAccount evaluates to null so the input username is not in the database.")
+        invalidCallback();
+      }
     }
   );
 }
