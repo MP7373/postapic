@@ -1,27 +1,32 @@
+/*
 .feed {
 	margin-left: 100px;
 	margin-right: 100px;
 	margin-top: 50px;
 	margin-bottom: 100px;
 	min-height: 1000px;
+	min-width: 225px;
 }
-
+*/
 .waifuFeed {
-	border: 1px solid #333;
+	border: 2px solid #333;
 	padding: 20px;
-	margin-left: 20px;
-	margin-right: 20px;
+	margin-left: 30px;
+	margin-right: 30px;
+	min-width: 225px;
 }
 
 .page-title {
-	margin-left: 100px;
+	margin-left: 80px;
 }
 
-.new-waifu {
-	border: 1px solid #333;
+.post-a-waifu {
+	/*border: 1px solid #333;*/
 	padding: 20px;
-	margin-left: 20px;
-	margin-right: 20px;}
+	margin-left: 30px;
+	margin-right: 30px;
+	min-width: 225px;
+}
 
 .deleteButton {
 	margin-top: 10px;
@@ -29,4 +34,9 @@
 
 #signInButton {
 	margin-top: 10px;
+}
+
+#loginBox {
+	margin: 10px;
+	/*background-color: green;*/
 }

@@ -46,6 +46,7 @@ app.controller("waifuFeedController", function ($rootScope, $scope, $http, $cook
 		});
 	}
 
+	//logs user out and removes related cookies
 	$scope.logout = function () {
 		$cookies.remove("token");
 		$cookies.remove("currentUser");

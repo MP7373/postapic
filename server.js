@@ -121,7 +121,7 @@ var postWaifu = function (db, newWaifu, callback) {
 		newWaifu,
 		function (err, result) {
     		assert.equal(err, null);
-    		console.log("Inserted waifu into the waifus collection.");
+    		console.log("Inserted " + newWaifu.name + " into the waifus collection.");
     		callback();
   		}
   	);
@@ -132,9 +132,9 @@ var deleteWaifu = function (db, id, callback) {
 	var idObject = ObjectId(id);
 	db.collection("waifus").deleteOne(
 		{"_id" : idObject},
-		function(err, result) {
+		function(err, deletedWaifu) {
     		assert.equal(err, null);
-    		console.log("Removed waifu from collection.");
+    		console.log("Removed " + deletedWaifu +" from collection.");
     		callback();
   		}
     );
@@ -165,8 +165,8 @@ var userSignIn = function (db, username, password, validCallback, invalidCallbac
       console.log("password = " + password);
       if(selectedAccount !== null) {
         bcrypt.compare(password, selectedAccount.password, function (err, result) {
-          console.log("Inside bcrypt.compare");
           if (result) {
+            //console.log{"Account valid logged in."};
             validCallback(selectedAccount);
           } else {
             console.log("selectedAccount evaluates to not null so the username exists but the input password doesn't match");
