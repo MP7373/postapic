@@ -32,7 +32,7 @@
 		<div class="picFeed well" ng-repeat="pic in pics">
 			<div>
 				<h3>{{ pic.name }}</h3>
-				<img class="img-rounded img-responsive center-block btn btn-default" ng-src="{{ pic.imageAddress }}" ng-click="showImageSource(pic.imageAddress)">
+				<img class="img-rounded img-responsive center-block btn" ng-src="{{ pic.imageAddress }}" ng-click="showImageSource(pic.imageAddress)">
 				<h6>Uploaded by: {{ pic.accountUsername }}</h6>
 			</div>
 			<button class="btn btn-default deleteButton" type="button" ng-show="showButton(pic)" ng-click="deletePic(pic)">delete</button>
