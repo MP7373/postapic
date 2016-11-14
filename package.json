@@ -1,7 +1,7 @@
 {
-  "name": "waifus",
+  "name": "postapic",
   "version": "1.0.0",
-  "description": "MEAN stack web app for posting waifus",
+  "description": "MEAN stack web app for posting pics",
   "main": "server.js",
   "dependencies": {
     "bcryptjs": "^2.3.0",
@@ -17,15 +17,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MP7373/waifus.git"
+    "url": "git+https://github.com/MP7373/postapic.git"
   },
   "keywords": [
-    "waifus"
+    "postapic"
   ],
   "author": "MP7373",
   "license": "UNLICENSED",
   "bugs": {
-    "url": "https://github.com/MP7373/waifus/issues"
+    "url": "https://github.com/MP7373/postapic/issues"
   },
-  "homepage": "https://github.com/MP7373/waifus#readme"
+  "homepage": "https://github.com/MP7373/postapic#readme"
 }
