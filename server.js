@@ -1,6 +1,7 @@
 var express = require("express");
 var MongoClient = require("mongodb").MongoClient, assert = require("assert");
-var url = "mongodb://localhost:27017/waifus";
+//var url = "mongodb://localhost:27017/waifus";
+var url = process.env.MONGOLAB_URI;
 var bodyParser = require("body-parser");
 var bcrypt = require("bcryptjs");
 var app = express();
@@ -94,7 +95,7 @@ app.put("/userAccounts/signIn", function (req, res) {
 });
 
 //Gives port for app to listen on
-app.listen(3000, function () {
+app.listen(process.env.PORT, function () {
 	console.log("App listening on port 3000.");
 });
 
