@@ -1,7 +1,7 @@
 var express = require("express");
 var MongoClient = require("mongodb").MongoClient, assert = require("assert");
 //var url = "mongodb://localhost:27017/waifus";
-var url = process.env.MONGOLAB_URI;
+//var url = process.env.MONGOLAB_URI;
 var bodyParser = require("body-parser");
 var bcrypt = require("bcryptjs");
 var app = express();
@@ -12,7 +12,7 @@ app.use(express.static("public"));
 ObjectId = require("mongodb").ObjectID;
 
 //Check Mongodb connection
-MongoClient.connect(url, function (err, db) {
+MongoClient.connect(process.env.MONGOLAB_URI, function (err, db) {
 	assert.equal(null, err);
 	console.log("Connection succesful!");
 	db.close();
@@ -22,7 +22,7 @@ MongoClient.connect(url, function (err, db) {
 
 //Get waifus data from database
 app.get("/waifus", function (req, res) {
-	MongoClient.connect(url, function (err, db) {
+	MongoClient.connect(process.env.MONGOLAB_URI, function (err, db) {
 		assert.equal(null, err);
 		var waifuCollection = db.collection("waifus");
 		waifuCollection.find({}).toArray(function (err, waifus) {
@@ -43,7 +43,7 @@ app.put("/waifus", function (req, res) {
     accountUsername: decodedToken.username,
     accountId: decodedToken._id
   };
-	MongoClient.connect(url, function(err, db) {
+	MongoClient.connect(process.env.MONGOLAB_URI, function(err, db) {
   		assert.equal(null, err);
   		postWaifu(db, newWaifu, function() {
       		db.close();
@@ -54,7 +54,7 @@ app.put("/waifus", function (req, res) {
 
 //calls deleteWaifu function to delete a waifu from database
 app.put("/waifus/delete", function (req, res) {
-	MongoClient.connect(url, function(err, db) {
+	MongoClient.connect(process.env.MONGOLAB_URI, function(err, db) {
   		assert.equal(null, err);
   		deleteWaifu(db, req.body.waifuToDeleteId, function() {
       		db.close();
@@ -65,7 +65,7 @@ app.put("/waifus/delete", function (req, res) {
 
 //calls submitNewAccount function to add a new user account to database
 app.put("/userAccounts", function (req, res) {
-  MongoClient.connect(url, function(err, db) {
+  MongoClient.connect(process.env.MONGOLAB_URI, function(err, db) {
       assert.equal(null, err);
       submitNewAccount(db, req.body.username, req.body.password, function(success) {
           db.close();
@@ -76,7 +76,7 @@ app.put("/userAccounts", function (req, res) {
 
 //checks if inputted username and pasword are in database and if they are logs into that account
 app.put("/userAccounts/signIn", function (req, res) {
-  MongoClient.connect(url, function(err, db) {
+  MongoClient.connect(process.env.MONGOLAB_URI, function(err, db) {
       assert.equal(null, err);
       userSignIn(db, req.body.username, req.body.password, 
         function (validUserAccount) {
