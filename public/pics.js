@@ -23,7 +23,7 @@ app.run(function ($rootScope, $cookies) {
 });
 
 //controller for the home page that includes the main feed of pics
-app.controller("picFeedController", function ($rootScope, $scope, $http, $cookies) {
+app.controller("picFeedController", function ($rootScope, $scope, $http, $cookies, $location, $anchorScroll) {
 
 	//loads feed with data upon first opening the page
 	updatePicFeed();
@@ -93,6 +93,12 @@ app.controller("picFeedController", function ($rootScope, $scope, $http, $cookie
 			return true;
 		}
 		return false;
+	}
+
+	//returns to top of page
+	$scope.goToTop = function () {
+		$location.hash("pageTop");
+		$anchorScroll();
 	}
 
 	//calls to update feed when page is loaded or database is changed
