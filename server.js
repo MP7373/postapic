@@ -1,6 +1,6 @@
 var express = require("express");
 var MongoClient = require("mongodb").MongoClient, assert = require("assert");
-//var url = "mongodb://localhost:27017/waifus";"
+//var url = "mongodb://localhost:27017/pics";"
 var url = "mongodb://heroku_sb514365:2o6f8ctdqpkmh79kab8pl1p956@ds061076.mlab.com:61076/heroku_sb514365";
 //var url = process.env.MONGOLAB_URI;
 var bodyParser = require("body-parser");
@@ -21,43 +21,43 @@ MongoClient.connect(url, function (err, db) {
 
 
 
-//Get waifus data from database
-app.get("/waifus", function (req, res) {
+//Get pics data from database
+app.get("/pics", function (req, res) {
 	MongoClient.connect(url, function (err, db) {
 		assert.equal(null, err);
-		var waifuCollection = db.collection("waifus");
-		waifuCollection.find({}).toArray(function (err, waifus) {
+		var picCollection = db.collection("pics");
+		picCollection.find({}).toArray(function (err, pics) {
     		assert.equal(err, null);
-    		res.json(waifus);
+    		res.json(pics);
     		db.close();
   		});
 	});
 });
 
-//calls postWaifu function to add a new waifu to database
-app.put("/waifus", function (req, res) {
+//calls postPic function to add a new pic to database
+app.put("/pics", function (req, res) {
   var token = req.headers.authorization;
   var decodedToken = jwt.decode(token, JWT_SECRET);
-  var newWaifu = {
-    name: req.body.newWaifuName,
-    imageAddress: req.body.newWaifuPic,
+  var newPic = {
+    name: req.body.newPicName,
+    imageAddress: req.body.newPic,
     accountUsername: decodedToken.username,
     accountId: decodedToken._id
   };
 	MongoClient.connect(url, function(err, db) {
   		assert.equal(null, err);
-  		postWaifu(db, newWaifu, function() {
+  		postPic(db, newPic, function() {
       		db.close();
           res.send(true);
   		});
 	});
 });
 
-//calls deleteWaifu function to delete a waifu from database
-app.put("/waifus/delete", function (req, res) {
+//calls deletePic function to delete a pic from database
+app.put("/pics/delete", function (req, res) {
 	MongoClient.connect(url, function(err, db) {
   		assert.equal(null, err);
-  		deleteWaifu(db, req.body.waifuToDeleteId, function() {
+  		deletePic(db, req.body.picToDeleteId, function() {
       		db.close();
           res.send(true);
   		});
@@ -97,35 +97,34 @@ app.put("/userAccounts/signIn", function (req, res) {
 
 //Gives port for app to listen on
 app.listen(process.env.PORT, function () {
-	console.log("App listening on port 3000.");
+	//console.log("App listening");
 });
 
-//function that posts new waifu into database
-var postWaifu = function (db, newWaifu, callback) {
-  console.log(newWaifu);
-  if (typeof newWaifu.name === "string") {
-  	db.collection("waifus").insertOne(
-  		newWaifu,
+//function that posts new pic into database
+var postPic = function (db, newPic, callback) {
+  if (typeof newPic.name === "string") {
+  	db.collection("pics").insertOne(
+  		newPic,
   		function (err, result) {
       		assert.equal(err, null);
-      		console.log("Inserted " + newWaifu.name + " into the waifus collection.");
+      		console.log("Inserted " + newPic.name + " into the pics collection.");
       		callback();
     	}
     );
   } else {
-    console.log("Name or image link invalid no waifu added.");
+    console.log("Name or image link invalid no pic added.");
     callback();
   }
 }
 
-//function that deletes a selected waifu from the database
-var deleteWaifu = function (db, id, callback) {
+//function that deletes a selected pic from the database
+var deletePic = function (db, id, callback) {
 	var idObject = ObjectId(id);
-	db.collection("waifus").deleteOne(
+	db.collection("pics").deleteOne(
 		{"_id" : idObject},
 		function(err, deletedWaifu) {
     		assert.equal(err, null);
-    		console.log("Removed waifu from collection.");
+    		console.log("Removed pic from collection.");
     		callback();
   		}
     );

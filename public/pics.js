@@ -1,12 +1,12 @@
 //initialize app
-var app = angular.module("waifus", ["ngRoute", "ngCookies"]);
+var app = angular.module("postapic", ["ngRoute", "ngCookies"]);
 
 //maps proper html files and controllers to different routes
 app.config(function ($routeProvider, $locationProvider) {
 	$routeProvider
 	.when("/", {
-		templateUrl: "waifuFeed.html",
-		controller: "waifuFeedController"
+		templateUrl: "picFeed.html",
+		controller: "picFeedController"
 	})
 	.when("/signup", {
 		templateUrl: "signUp.html",
@@ -22,11 +22,11 @@ app.run(function ($rootScope, $cookies) {
 	};
 });
 
-//controller for the home page that includes the main feed of waifus
-app.controller("waifuFeedController", function ($rootScope, $scope, $http, $cookies) {
+//controller for the home page that includes the main feed of pics
+app.controller("picFeedController", function ($rootScope, $scope, $http, $cookies) {
 
 	//loads feed with data upon first opening the page
-	updateWaifusFeed();
+	updatePicFeed();
 
 	//signs user into account
 	$scope.signIn = function () {
@@ -36,12 +36,12 @@ app.controller("waifuFeedController", function ($rootScope, $scope, $http, $cook
 			$rootScope.currentUser = $scope.username;
 			$rootScope.token = response.data.token;
 			$scope.failedAttempt = null;
-			updateWaifusFeed();
+			updatePicFeed();
 		}, function (err) {
 			$scope.username = "";
 			$scope.password = "";
 			$scope.failedAttempt = true;
-			updateWaifusFeed();
+			updatePicFeed();
 		});
 	}
 
@@ -53,52 +53,52 @@ app.controller("waifuFeedController", function ($rootScope, $scope, $http, $cook
 		$rootScope.currentUser = "";
 		$scope.username = "";
 		$scope.password = "";
-		updateWaifusFeed();
+		updatePicFeed();
 	}
 
-	//sends new waifu to database
-	$scope.submitWaifu = function () {
-		$http.put("/waifus",
-			{newWaifuName: $scope.newWaifuName, newWaifuPic: $scope.newWaifuPic},
+	//sends new pic to database
+	$scope.submitPic = function () {
+		$http.put("/pics",
+			{newPicName: $scope.newPicName, newPic: $scope.newPic},
 			{headers: {
 				"authorization": $rootScope.token
 			}}
 		).then(function () {
-			$scope.newWaifuName = "";
-			$scope.newWaifuPic = "";
-			updateWaifusFeed();
+			$scope.newPicName = "";
+			$scope.newPic = "";
+			updatePicFeed();
 		},
 		function () {
-			$scope.newWaifuName = "";
-			$scope.newWaifuPic = "";
-			updateWaifusFeed();
+			$scope.newPicName = "";
+			$scope.newPic = "";
+			updatePicFeed();
 		});
 	}
 	
-	//deletes waifu from database
-	$scope.deleteWaifu = function (waifu) {
-		$http.put("/waifus/delete", {waifuToDeleteId: waifu._id}).then(function () {
-			updateWaifusFeed();
+	//deletes pic from database
+	$scope.deletePic = function (pic) {
+		$http.put("/pics/delete", {picToDeleteId: pic._id}).then(function () {
+			updatePicFeed();
 		},
 		function () {
-			updateWaifusFeed();
+			updatePicFeed();
 		});
 	}
 
-	//calls for each element in waifus feed and will show a delete button for every waifu in feed
+	//calls for each element in pic feed and will show a delete button for every pic in feed
 	//that was uploaded by the currently logged in user
-	$scope.showButton = function (waifu) {
+	$scope.showButton = function (pic) {
 		var currentUsername = $cookies.get("currentUser");
-		if (currentUsername === waifu.accountUsername) {
+		if (currentUsername === pic.accountUsername) {
 			return true;
 		}
 		return false;
 	}
 
 	//calls to update feed when page is loaded or database is changed
-	function updateWaifusFeed () {
-		$http.get("/waifus").then(function (res) {
-			$rootScope.waifus = res.data;
+	function updatePicFeed () {
+		$http.get("/pics").then(function (res) {
+			$rootScope.pics = res.data;
 		});
 	}
 });
