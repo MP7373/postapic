@@ -4,6 +4,7 @@
 	<input id="signUpPasswordForm" type="password" placeholder="Enter a password" ng-model="newPassword">
 	<button class="btn" type="button" ng-click="submitNewUserAccount()">Sign Up</button>
 	<h6 class="text-success" ng-show="newAccountCreated">New account succesfully created!</h6>
+	<h6 class="text-danger" ng-show="accountAlreadyExists">Account already exists with that username.</h6>
 	<br>
 	<a class="btn" href="#/">back to waifus feed</a>
 </div>

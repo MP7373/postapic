@@ -20,7 +20,7 @@ MongoClient.connect(url, function (err, db) {
 
 
 //Get waifus data from database
-app.get("/waifus", function (req, res, next) {
+app.get("/waifus", function (req, res) {
 	MongoClient.connect(url, function (err, db) {
 		assert.equal(null, err);
 		var waifuCollection = db.collection("waifus");
@@ -32,27 +32,8 @@ app.get("/waifus", function (req, res, next) {
 	});
 });
 
-//get user account
-app.post("/userAccounts/getId", function (req, res, next) {
-  var token = req.body.token;
-  var decodedToken = jwt.decode(token, JWT_SECRET);
-  var id = decodedToken._id;
-  var idObject = ObjectId(id);
-  MongoClient.connect(url, function (err, db) {
-    assert.equal(null, err);
-    db.collection("userAccounts").findOne(
-      {"_id": idObject},
-      function(err, matchedAccount) {
-        assert.equal(err, null);
-        res.json(matchedAccount);
-        db.close();
-      }
-    );
-  });
-});
-
 //calls postWaifu function to add a new waifu to database
-app.post("/waifus", function (req, res, next) {
+app.put("/waifus", function (req, res) {
   var token = req.headers.authorization;
   var decodedToken = jwt.decode(token, JWT_SECRET);
   var newWaifu = {
@@ -65,45 +46,47 @@ app.post("/waifus", function (req, res, next) {
   		assert.equal(null, err);
   		postWaifu(db, newWaifu, function() {
       		db.close();
+          res.send(true);
   		});
 	});
 });
 
 //calls deleteWaifu function to delete a waifu from database
-app.put("/waifus/delete", function (req, res, next) {
+app.put("/waifus/delete", function (req, res) {
 	MongoClient.connect(url, function(err, db) {
   		assert.equal(null, err);
   		deleteWaifu(db, req.body.waifuToDeleteId, function() {
       		db.close();
+          res.send(true);
   		});
 	});
 });
 
 //calls submitNewAccount function to add a new user account to database
-app.post("/userAccounts", function (req, res, next) {
+app.put("/userAccounts", function (req, res) {
   MongoClient.connect(url, function(err, db) {
       assert.equal(null, err);
-      submitNewAccount(db, req.body.username, req.body.password, function() {
+      submitNewAccount(db, req.body.username, req.body.password, function(success) {
           db.close();
-          res.send();
+          res.send(success);
       });
   });
 });
 
 //checks if inputted username and pasword are in database and if they are logs into that account
-app.put("/userAccounts/signIn", function (req, res, next) {
+app.put("/userAccounts/signIn", function (req, res) {
   MongoClient.connect(url, function(err, db) {
       assert.equal(null, err);
       userSignIn(db, req.body.username, req.body.password, 
         function (validUserAccount) {
+          console.log("Valid account, returning token.");
           db.close();
           var token = jwt.encode(validUserAccount, JWT_SECRET);
           return res.json({token: token});
         },
         function () {
-          console.log("Inside invalidCallback.");
+          console.log("Invalid account, returning error.");
           db.close();
-          console.log("Returning res.status(400).send()");
           return res.status(400).send();
         }
       );
@@ -117,14 +100,20 @@ app.listen(3000, function () {
 
 //function that posts new waifu into database
 var postWaifu = function (db, newWaifu, callback) {
-	db.collection("waifus").insertOne(
-		newWaifu,
-		function (err, result) {
-    		assert.equal(err, null);
-    		console.log("Inserted " + newWaifu.name + " into the waifus collection.");
-    		callback();
-  		}
-  	);
+  console.log(newWaifu);
+  if (typeof newWaifu.name === "string") {
+  	db.collection("waifus").insertOne(
+  		newWaifu,
+  		function (err, result) {
+      		assert.equal(err, null);
+      		console.log("Inserted " + newWaifu.name + " into the waifus collection.");
+      		callback();
+    	}
+    );
+  } else {
+    console.log("Name or image link invalid no waifu added.");
+    callback();
+  }
 }
 
 //function that deletes a selected waifu from the database
@@ -134,7 +123,7 @@ var deleteWaifu = function (db, id, callback) {
 		{"_id" : idObject},
 		function(err, deletedWaifu) {
     		assert.equal(err, null);
-    		console.log("Removed " + deletedWaifu +" from collection.");
+    		console.log("Removed waifu from collection.");
     		callback();
   		}
     );
@@ -144,15 +133,25 @@ var deleteWaifu = function (db, id, callback) {
 var submitNewAccount = function (db, username, password, callback) {
   bcrypt.genSalt(10, function (err, salt) {
     bcrypt.hash(password, salt, function (err, hash) {
-      db.collection("userAccounts").insertOne(
-        {"username" : username, "password" : hash},
-        function (err, submittedAccount) {
-          assert.equal(err, null);
-          console.log("Added new user account " + username + " into the userAccounts collection.");
-          callback();
+      db.collection("userAccounts").findOne(
+        {username: username},
+        function (err, selectedAccount) {
+          if (selectedAccount === null) {
+            db.collection("userAccounts").insertOne(
+              {"username" : username, "password" : hash},
+              function (err, submittedAccount) {
+                assert.equal(err, null);
+                console.log("Added new user account " + username + " into the userAccounts collection.");
+                callback(true);
+              }
+            );
+          } else {
+            console.log("Account with the username " + username + " already exits no new account created.");
+            callback(false);
+          }
         }
       );
-    })
+    });
   });
 }
 

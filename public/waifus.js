@@ -20,7 +20,6 @@ app.run(function ($rootScope, $cookies) {
 		$rootScope.token = $cookies.get("token");
 		$rootScope.currentUser = $cookies.get("currentUser");
 	};
-	console.log($cookies.get("currentUser"));
 });
 
 //controller for the home page that includes the main feed of waifus
@@ -59,27 +58,31 @@ app.controller("waifuFeedController", function ($rootScope, $scope, $http, $cook
 
 	//sends new waifu to database
 	$scope.submitWaifu = function () {
-		$http.post("/waifus",
+		$http.put("/waifus",
 			{newWaifuName: $scope.newWaifuName, newWaifuPic: $scope.newWaifuPic},
 			{headers: {
 				"authorization": $rootScope.token
 			}}
-			).then(function () {
+		).then(function () {
+			$scope.newWaifuName = "";
+			$scope.newWaifuPic = "";
+			updateWaifusFeed();
+		},
+		function () {
 			$scope.newWaifuName = "";
 			$scope.newWaifuPic = "";
 			updateWaifusFeed();
 		});
-		$scope.newWaifuName = "";
-		$scope.newWaifuPic = "";
-		updateWaifusFeed();
 	}
 	
 	//deletes waifu from database
 	$scope.deleteWaifu = function (waifu) {
 		$http.put("/waifus/delete", {waifuToDeleteId: waifu._id}).then(function () {
 			updateWaifusFeed();
+		},
+		function () {
+			updateWaifusFeed();
 		});
-		updateWaifusFeed();
 	}
 
 	//calls for each element in waifus feed and will show a delete button for every waifu in feed
@@ -94,9 +97,8 @@ app.controller("waifuFeedController", function ($rootScope, $scope, $http, $cook
 
 	//calls to update feed when page is loaded or database is changed
 	function updateWaifusFeed () {
-		$http.get("/waifus").then(function (response) {
-			console.log($cookies.get("currentUser"));
-			$scope.waifus = response.data;
+		$http.get("/waifus").then(function (res) {
+			$rootScope.waifus = res.data;
 		});
 	}
 });
@@ -106,8 +108,14 @@ app.controller("signUpController", function ($scope, $http) {
 
 	//sends new account to database
 	$scope.submitNewUserAccount = function () {
-		$http.post("/userAccounts", {username: $scope.newUsername, password: $scope.newPassword}).then(function () {
-			$scope.newAccountCreated = true;
+		$http.put("/userAccounts", {username: $scope.newUsername, password: $scope.newPassword}).then(function (res) {
+			if (res.data === true) {
+				$scope.newAccountCreated = true;
+				$scope.accountAlreadyExists = false;
+			} else {
+				$scope.accountAlreadyExists = true;
+				$scope.newAccountCreated = false;
+			}
 			$scope.newUsername = "";
 			$scope.newPassword = "";
 		});
